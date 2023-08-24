@@ -6,3 +6,9 @@ Setup your environment either with the ```setup.py``` script or by running the f
 ```
 pip install -r requirements.txt
 ```
+
+Alternatively, you can run the following command INSIDE the ```src``` directory to install locally:
+
+```
+pip install .
+```
