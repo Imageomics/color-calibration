@@ -11,13 +11,13 @@ class DatasetPaths:
     """Helper class to manage dataset paths and structure"""
     def __init__(self, dataset_base_dir, dataset_output_dir):
         self.base_dir = Path(dataset_base_dir)
-        self.output_dir = Path(dataset_output_dir)
-        self.resized_dir = self.output_dir / "resized"
-        
         if not self.base_dir.exists():
             raise FileNotFoundError(f"Dataset base directory not found: {self.base_dir}")
+        self.output_dir = Path(dataset_output_dir)
         if not self.output_dir.exists():
             raise FileNotFoundError(f"Dataset output directory not found: {self.output_dir}")
+        
+        self.resized_dir = self.output_dir / "resized"
         
         self.coco_data = load_coco_annotations(self.output_dir)
     

@@ -66,8 +66,8 @@ If the images were not resized, the color calibration will be applied to the ori
 
 
 ## Outputs
-- `--save-dir` will contain the full dataset of calibrated image in the same directory structure as the `--dataset-dir` input dataset. The image used as reference will be copied as-is from the input dataset to keep the full dataset together.
-- `calibration_log.json` that tracks the inputs used for the calibration process.
+- `--save-dir` will contain the full dataset of calibrated images in the same directory structure as the `--dataset-dir` input dataset. The image used as reference will be copied as-is from the input dataset to keep the full dataset together.
+- `calibration_log.json` tracks the inputs used for the calibration process.
 - If `--detailed-outputs` is enabled, the `--save-dir` will also contain a `detailed-outputs/` directory. This directory will contain:
     - A directory structure matching the `--dataset-dir` input dataset with the following image types:
         - `orig_tgt_color_card_<img-name>.png`

@@ -24,7 +24,7 @@ def create_color_mapping(ref_hist, tgt_hist):
 def match_histograms(ref_card, tgt_card, tgt_image):
     """
     Perform channel-wise histogram matching based on the normalized foreground intensities.
-    No resizing is performed—the normalized cumulative histogram is computed on the raw,
+    No resizing is performed; the normalized cumulative histogram is computed on the raw,
     segmented color card images. Then, for each channel, the mapping is applied to both
     the full target image and the extracted (segmented) target color card.
     
