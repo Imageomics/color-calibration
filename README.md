@@ -7,7 +7,6 @@ It relies on:
 And produces:
 - Matched histograms for each segmented color card in the target images, applying each calibration to its respective image.
 
-
 ### Installation
 To install in development mode, create and activate a virtual environment, and install this package using:
 ```bash
