@@ -24,7 +24,10 @@ classifiers = [
 dependencies = [
     "numpy",
     "opencv-python",
-    "tqdm"
+    "pycocotools",
+    "tqdm",
+    "plotly",
+    "Pillow"
 ]
 
 [project.optional-dependencies]
@@ -36,6 +39,9 @@ dev = [
 [project.urls]
 "Source" = "https://github.com/Imageomics/color-calibration"
 "Issues" = "https://github.com/Imageomics/color-calibration/issues"
+
+[project.scripts]
+colorcal = "color_calibration.__main__:main"
 
 [tool.hatch.build]
 include = [
