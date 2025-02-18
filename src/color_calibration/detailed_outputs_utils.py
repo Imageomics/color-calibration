@@ -169,29 +169,31 @@ def save_all_detailed_outputs(ref_image, ref_seg, ref_card,
     """
     detailed_outputs_dir = Path(detailed_outputs_dir) / "detailed-outputs"
     detailed_outputs_dir.mkdir(parents=True, exist_ok=True)
+
+    base = Path(base_filename).stem
     
     # Save reference segmented color card
-    ref_card_path = detailed_outputs_dir / f"ref_color_card_{base_filename}.png"
+    ref_card_path = detailed_outputs_dir / f"ref_color_card_{base}.png"
     cv2.imwrite(str(ref_card_path), ref_card)
     
     # Save reference full image
-    ref_full_path = detailed_outputs_dir / f"ref_full_image_{base_filename}.png"
+    ref_full_path = detailed_outputs_dir / f"ref_full_image_{base}.png"
     cv2.imwrite(str(ref_full_path), ref_image)
     
     # Save original target segmented color card
-    tgt_card_path = detailed_outputs_dir / f"orig_tgt_color_card_{base_filename}.png"
+    tgt_card_path = detailed_outputs_dir / f"orig_tgt_color_card_{base}.png"
     cv2.imwrite(str(tgt_card_path), tgt_card)
     
     # Save transformed target segmented color card
-    trans_tgt_card_path = detailed_outputs_dir / f"trans_tgt_color_card_{base_filename}.png"
+    trans_tgt_card_path = detailed_outputs_dir / f"trans_tgt_color_card_{base}.png"
     cv2.imwrite(str(trans_tgt_card_path), calibrated_tgt_card)
     
     # Save original target full image
-    tgt_full_path = detailed_outputs_dir / f"orig_tgt_full_image_{base_filename}.png"
+    tgt_full_path = detailed_outputs_dir / f"orig_tgt_full_image_{base}.png"
     cv2.imwrite(str(tgt_full_path), tgt_image)
     
     # Save transformed target full image
-    trans_tgt_full_path = detailed_outputs_dir / f"trans_tgt_full_image_{base_filename}.png"
+    trans_tgt_full_path = detailed_outputs_dir / f"trans_tgt_full_image_{base}.png"
     cv2.imwrite(str(trans_tgt_full_path), calibrated_full_image)
-    
+
     print(f"Saved detailed outputs images to {detailed_outputs_dir}")

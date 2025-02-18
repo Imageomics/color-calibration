@@ -26,7 +26,8 @@ dependencies = [
     "opencv-python",
     "pycocotools",
     "tqdm",
-    "plotly"
+    "plotly",
+    "Pillow"
 ]
 
 [project.optional-dependencies]

@@ -2,6 +2,7 @@ import sys
 import datetime
 import json
 from pathlib import Path
+from PIL import Image
 from tqdm import tqdm
 import cv2
 
@@ -12,13 +13,18 @@ from .detailed_outputs_utils import save_histogram_detailed_outputs
 
 def get_dataset_files(dataset_dir: Path):
     """
-    Recursively get all image files in the dataset directory.
+    Recursively get all valid image files in the dataset directory by trying to open them with Pillow.
     """
-    image_extensions = {'.jpg', '.jpeg', '.JPG', '.JPEG'}
     files = set()
-    for ext in image_extensions:
-        for file_path in dataset_dir.rglob(f'*{ext}'):
-            files.add(str(file_path.relative_to(dataset_dir)))
+    for file_path in dataset_dir.rglob('*'):
+        if file_path.is_file():
+            try:
+                with Image.open(file_path) as img:
+                    img.verify()
+                files.add(str(file_path.relative_to(dataset_dir)))
+            except Exception:
+                # Skip file if PIL doesn't verify as an image
+                continue
     return files
 
 def validate_dataset(dataset_dir: Path, coco_data: dict):
@@ -121,8 +127,9 @@ def process_dataset(args):
     
     # Save the reference full image to the mirrored output structure
     ref_output_path = args.save_dir / ref_rel_path
-    ref_output_path.parent.mkdir(parents=True, exist_ok=True)
-    cv2.imwrite(str(ref_output_path), ref_image)
+    ref_output_png = Path(ref_output_path).with_suffix(".png")
+    ref_output_png.parent.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(ref_output_png), ref_image)
     print(f"Copied reference full image to {ref_output_path}")
     
     if args.detailed_outputs:
@@ -141,8 +148,10 @@ def process_dataset(args):
             continue
         try:
             target_rel_path = Path(img_info['file_name'])
+
             output_path = args.save_dir / target_rel_path
-            output_path.parent.mkdir(parents=True, exist_ok=True)
+            png_output_path = Path(output_path).with_suffix(".png")
+            png_output_path.parent.mkdir(parents=True, exist_ok=True)
             
             tgt_path = dataset.get_image_path(img_info['file_name'])
             tgt_image = cv2.imread(str(tgt_path))
@@ -156,16 +165,19 @@ def process_dataset(args):
             
             calibrated_full_image, calibrated_tgt_card = match_histograms(ref_card, tgt_card, tgt_image)
             
-            cv2.imwrite(str(output_path), calibrated_full_image)
-            
+            cv2.imwrite(str(png_output_path), calibrated_full_image)
+
             if args.detailed_outputs:
                 detailed_images_dir = args.save_dir / "detailed-outputs" / target_rel_path.parent
                 detailed_images_dir.mkdir(parents=True, exist_ok=True)
-                target_filename = target_rel_path.name
+
+                target_filename = Path(target_rel_path).stem
+
                 orig_tgt_color_card_path = detailed_images_dir / f"orig_tgt_color_card_{target_filename}.png"
-                orig_tgt_full_image_path  = detailed_images_dir / f"orig_tgt_full_image_{target_filename}.png"
+                orig_tgt_full_image_path = detailed_images_dir / f"orig_tgt_full_image_{target_filename}.png"
                 trans_tgt_color_card_path = detailed_images_dir / f"trans_tgt_color_card_{target_filename}.png"
-                trans_tgt_full_image_path  = detailed_images_dir / f"trans_tgt_full_image_{target_filename}.png"
+                trans_tgt_full_image_path = detailed_images_dir / f"trans_tgt_full_image_{target_filename}.png"
+
                 cv2.imwrite(str(orig_tgt_color_card_path), tgt_card)
                 cv2.imwrite(str(orig_tgt_full_image_path), tgt_image)
                 cv2.imwrite(str(trans_tgt_color_card_path), calibrated_tgt_card)

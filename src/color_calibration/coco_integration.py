@@ -31,23 +31,36 @@ class DatasetPaths:
         Returns:
             Path: Full path to the image (resized version if available, otherwise original)
         """
-        # Check resized directory first
+
+        file_path = Path(file_name)
+        target_stem = file_path.stem.lower()
+
+        def find_candidate(directory: Path) -> Path:
+            # First, try the full relative path
+            candidate = directory / file_path
+            if candidate.exists():
+                return candidate
+            # Otherwise, search in the same directory for a file with the same stem
+            search_dir = directory / file_path.parent
+            if search_dir.exists():
+                for candidate in search_dir.iterdir():
+                    if candidate.is_file() and candidate.stem.lower() == target_stem:
+                        return candidate
+            return None
+
+        # Check in resized dir first
         if self.resized_dir.exists():
-            resized_path = self.resized_dir / file_name
-            if resized_path.exists():
-                return resized_path
-                
-            # If file name includes subdirectories, try just the base name
-            resized_base_path = self.resized_dir / Path(file_name).name
-            if resized_base_path.exists():
-                return resized_base_path
-        
-        # Fall back to original image if resized not found
-        original_path = self.base_dir / file_name
-        if original_path.exists():
-            print(f"Using original image {original_path}; no resized version found")
-            return original_path
-            
+            candidate = find_candidate(self.resized_dir)
+            if candidate:
+                print(f"Found resized image: {candidate}")
+                return candidate
+
+        # Fall back to base dir
+        candidate = find_candidate(self.base_dir)
+        if candidate:
+            print(f"Using original image {candidate}; no resized version found")
+            return candidate
+
         raise FileNotFoundError(f"Image not found in either resized or original locations: {file_name}")
     
     def find_image_by_name(self, image_name):
@@ -124,16 +137,17 @@ def calibrate_dataset_images(
     
     # Save the calibrated full image
     output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    cv2.imwrite(str(output_path), calibrated_full_image)
+    png_output_path = output_path.with_suffix(".png")
+    png_output_path.parent.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(png_output_path), calibrated_full_image)
     
     # Save detailed outputs if requested
     if detailed_outputs:
         from .detailed_outputs_utils import save_all_detailed_outputs, save_histogram_detailed_outputs
         detailed_outputs_dir = output_path.parent / "detailed-outputs"
         detailed_outputs_dir.mkdir(parents=True, exist_ok=True)
-        base_filename = Path(output_path).name
-        
+        base_filename = Path(output_path).stem
+
         # Save the detailed output images
         save_all_detailed_outputs(
             ref_image, ref_ann['segmentation'], ref_card,
